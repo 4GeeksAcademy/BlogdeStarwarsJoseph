@@ -1,37 +1,96 @@
-// Import necessary hooks and components from react-router-dom and other libraries.
-import { Link, useParams } from "react-router-dom";  // To use link for navigation and useParams to get URL parameters
-import PropTypes from "prop-types";  // To define prop types for this component
-import rigoImageUrl from "../assets/img/rigo-baby.jpg"  // Import an image asset
-import useGlobalReducer from "../hooks/useGlobalReducer";  // Import a custom hook for accessing the global state
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
-// Define and export the Single component which displays individual item details.
-export const Single = props => {
-  // Access the global state using the custom hook.
-  const { store } = useGlobalReducer()
+export const Single = () => {
+  const { store, dispatch } = useGlobalReducer();
+  const { type, uid } = useParams();
+  const [detail, setDetail] = useState(null);
 
-  // Retrieve the 'theId' URL parameter using useParams hook.
-  const { theId } = useParams()
-  const singleTodo = store.todos.find(todo => todo.id === parseInt(theId));
+
+  const fetchDetail = async () => {
+    try {
+      const response = await fetch(`https://www.swapi.tech/api/${type}/${uid}`);
+      const data = await response.json();
+      setDetail(data.result.properties);
+    } catch (error) {
+      console.error("Error fetching detail:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDetail();
+  }, [type, uid]);
+
+  if (!detail) {
+    return <div className="container mt-5">Cargando...</div>;
+  }
+
+
+  const imageType =
+    type === "people"
+      ? "characters"
+      : type === "planets"
+        ? "planets"
+        : type === "vehicles"
+          ? "vehicles"
+          : "placeholder";
+
+  const toggleFavorite = () => {
+    const exist = store.favorites.find(
+      (fav) => fav.uid === uid && fav.type === type
+    );
+    if (exist) {
+      dispatch({ type: "remove-favorite", payload: { uid, type } });
+    } else {
+      dispatch({ type: "add-favorite", payload: { ...detail, uid, type } });
+    }
+  };
+
+  const isFavorite = store.favorites.find(
+    (fav) => fav.uid === uid && fav.type === type
+  );
 
   return (
-    <div className="container text-center">
-      {/* Display the title of the todo element dynamically retrieved from the store using theId. */}
-      <h1 className="display-4">Todo: {singleTodo?.title}</h1>
-      <hr className="my-4" />  {/* A horizontal rule for visual separation. */}
+    <div className="container mt-5">
+      <div className="card p-4">
+        <div className="row">
 
-      {/* A Link component acts as an anchor tag but is used for client-side routing to prevent page reloads. */}
-      <Link to="/">
-        <span className="btn btn-primary btn-lg" href="#" role="button">
-          Back home
-        </span>
-      </Link>
+          <div className="col-md-4">
+            <img
+              src="https://www.thesun.co.uk/wp-content/uploads/2019/12/VP-PIC-STAR-WARS-3.jpg?quality=90&strip=all"
+              className="img-fluid"
+              alt={detail.name}
+            />
+          </div>
+
+          <div className="col-md-8">
+            <h2>{detail.name}</h2>
+
+            <button
+              className={`btn ${isFavorite ? "btn-danger" : "btn-warning"} mb-3`}
+              onClick={toggleFavorite}
+            >
+              {isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+            </button>
+
+            <div className="list-group">
+              {Object.entries(detail).map(([key, value]) => {
+                if (key === "name") return null;
+                return (
+                  <p key={key} className="list-group-item">
+                    <strong>{key.replaceAll("_", " ")}:</strong>{" "}
+                    {Array.isArray(value) ? `${value.length} items` : value}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 };
 
-// Use PropTypes to validate the props passed to this component, ensuring reliable behavior.
-Single.propTypes = {
-  // Although 'match' prop is defined here, it is not used in the component.
-  // Consider removing or using it as needed.
-  match: PropTypes.object
-};
+export default Single;
