@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Single = () => {
-  const { store, dispatch } = useGlobalReducer();
+  const { store } = useGlobalReducer();
   const { type, uid } = useParams();
   const [detail, setDetail] = useState(null);
 

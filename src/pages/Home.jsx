@@ -32,22 +32,16 @@ const Home = () => {
           />
           <div className="card-body d-flex flex-column">
             <h5>{item.name}</h5>
-            <div className="mt-auto d-flex justify-content-between">
+
+            <div className="mt-auto">
               <Link
                 to={`/single/${type}/${item.uid}`}
                 className="btn btn-primary"
               >
                 Detalle
               </Link>
-              <button
-                className="btn btn-warning"
-                onClick={() =>
-                  dispatch({ type: "add-favorite", payload: { ...item, type } })
-                }
-              >
-                <i className="fa-solid fa-star text-dark"></i>
-              </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -56,6 +50,7 @@ const Home = () => {
 
   return (
     <div className="container mt-4">
+
       <h2>Personajes</h2>
       <div className="row">
         {renderCards(store.people, "people")}
@@ -70,6 +65,7 @@ const Home = () => {
       <div className="row">
         {renderCards(store.vehicles, "vehicles")}
       </div>
+
     </div>
   );
 };
