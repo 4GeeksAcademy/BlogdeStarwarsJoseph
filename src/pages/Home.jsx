@@ -22,30 +22,84 @@ const Home = () => {
   };
 
   const renderCards = (array, type) => {
-    return array?.map((item) => (
-      <div key={item.uid} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-        <div className="card h-100">
-          <img
-            src="https://www.thesun.co.uk/wp-content/uploads/2019/12/VP-PIC-STAR-WARS-3.jpg?quality=90&strip=all"
-            className="card-img-top"
-            alt={item.name}
-          />
-          <div className="card-body d-flex flex-column">
-            <h5>{item.name}</h5>
+    return array?.map((item) => {
 
-            <div className="mt-auto">
-              <Link
-                to={`/single/${type}/${item.uid}`}
-                className="btn btn-primary"
-              >
-                Detalle
-              </Link>
+      const isFavorite = store.favorites.find(
+        (fav) => fav.uid === item.uid && fav.type === type
+      );
+
+      return (
+        <div key={item.uid} className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+
+          <div className="card h-100">
+
+            <img
+              src="https://www.thesun.co.uk/wp-content/uploads/2019/12/VP-PIC-STAR-WARS-3.jpg?quality=90&strip=all"
+              className="card-img-top"
+              alt={item.name}
+            />
+
+            <div className="card-body d-flex flex-column">
+
+              <h5>{item.name}</h5>
+
+              <div className="mt-auto d-flex justify-content-between">
+
+                <Link
+                  to={`/single/${type}/${item.uid}`}
+                  className="btn"
+                  style={{
+                    border: "2px solid #0d6efd",
+                    backgroundColor: "white",
+                    color: "#0d6efd"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#0d6efd";
+                    e.target.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "white";
+                    e.target.style.color = "#0d6efd";
+                  }}
+                >
+                  Detalle
+                </Link>
+
+                <button
+                  className="btn"
+                  style={{
+                    backgroundColor: "white",
+                    border: "2px solid #ffc107"
+                  }}
+                  onClick={(e) => {
+                    dispatch({
+                      type: "add-favorite",
+                      payload: { ...item, type }
+                    });
+
+                    e.currentTarget.style.transform = "scale(1.3)";
+                    setTimeout(() => {
+                      e.currentTarget.style.transform = "scale(1)";
+                    }, 200);
+                  }}
+                >
+                  <i
+                    className={`${isFavorite
+                        ? "fa-solid fa-heart text-warning"
+                        : "fa-regular fa-heart text-warning"
+                      }`}
+                  ></i>
+                </button>
+
+              </div>
+
             </div>
 
           </div>
+
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   return (

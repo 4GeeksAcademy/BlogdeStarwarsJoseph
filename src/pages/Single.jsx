@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Single = () => {
-  const { store } = useGlobalReducer();
+
+  const { store, dispatch } = useGlobalReducer();
   const { type, uid } = useParams();
   const [detail, setDetail] = useState(null);
-
 
   const fetchDetail = async () => {
     try {
@@ -26,20 +26,11 @@ export const Single = () => {
     return <div className="container mt-5">Cargando...</div>;
   }
 
-
-  const imageType =
-    type === "people"
-      ? "characters"
-      : type === "planets"
-        ? "planets"
-        : type === "vehicles"
-          ? "vehicles"
-          : "placeholder";
-
   const toggleFavorite = () => {
     const exist = store.favorites.find(
       (fav) => fav.uid === uid && fav.type === type
     );
+
     if (exist) {
       dispatch({ type: "remove-favorite", payload: { uid, type } });
     } else {
@@ -53,7 +44,9 @@ export const Single = () => {
 
   return (
     <div className="container mt-5">
+
       <div className="card p-4">
+
         <div className="row">
 
           <div className="col-md-4">
@@ -65,18 +58,30 @@ export const Single = () => {
           </div>
 
           <div className="col-md-8">
+
             <h2>{detail.name}</h2>
 
             <button
-              className={`btn ${isFavorite ? "btn-danger" : "btn-warning"} mb-3`}
+              className="btn mb-3"
+              style={{
+                backgroundColor: "white",
+                border: "2px solid #ffc107"
+              }}
               onClick={toggleFavorite}
             >
-              {isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+              <i
+                className={`${isFavorite
+                    ? "fa-solid fa-heart text-warning"
+                    : "fa-regular fa-heart text-warning"
+                  }`}
+              ></i>
             </button>
 
             <div className="list-group">
+
               {Object.entries(detail).map(([key, value]) => {
                 if (key === "name") return null;
+
                 return (
                   <p key={key} className="list-group-item">
                     <strong>{key.replaceAll("_", " ")}:</strong>{" "}
@@ -84,11 +89,15 @@ export const Single = () => {
                   </p>
                 );
               })}
+
             </div>
+
           </div>
 
         </div>
+
       </div>
+
     </div>
   );
 };
